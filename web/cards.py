@@ -44,6 +44,7 @@ def get(page, limit):
 	return jsonify(page=page, pagecount=pagecount, cards=strip_unicode(cards))
 
 
+# TODO: Protect this route from DDOS, etc
 @bp.route('update', methods=['POST'])
 def update():
 	print('Getting sets')

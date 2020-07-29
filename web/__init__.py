@@ -14,8 +14,8 @@ app.secret_key = config.SECRETKEY
 from web.cards import bp as cards_bp
 from web.pricing import bp as pricing_bp
 
-app.register_blueprint(cards_bp, url_prefix='/cards')
-app.register_blueprint(pricing_bp, url_prefix='/pricing')
+app.register_blueprint(cards_bp, url_prefix='/api/cards')
+app.register_blueprint(pricing_bp, url_prefix='/api/pricing')
 
 
 @app.before_first_request

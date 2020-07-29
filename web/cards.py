@@ -8,6 +8,7 @@ bp = Blueprint('cards', __name__)
 
 
 @bp.route('')
+@decorators.auth_required
 @decorators.paginated
 def get(page, limit):
 	pagecount = fetch_query(

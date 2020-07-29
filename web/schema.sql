@@ -1,3 +1,6 @@
+-- Used for API key generation
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 CREATE TABLE card_set (
 	id SERIAL PRIMARY KEY,
 	tcgplayerid INTEGER NOT NULL,
@@ -34,3 +37,11 @@ CREATE TABLE price (
 );
 
 CREATE UNIQUE INDEX price_created_idx ON price(cardid, foil, created);
+
+CREATE TABLE user_account (
+	id SERIAL PRIMARY KEY,
+	firstname TEXT NOT NULL,
+	surname TEXT NOT NULL,
+	email TEXT NOT NULL,
+	apikey TEXT NOT NULL DEFAULT uuid_generate_v4()
+);

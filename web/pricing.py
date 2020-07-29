@@ -1,12 +1,13 @@
 from flask import Blueprint, jsonify
 from flasktools.db import fetch_query
-from web import asynchro
+from web import asynchro, decorators
 
 
 bp = Blueprint('pricing', __name__)
 
 
 @bp.route('/<int:cardid>')
+@decorators.auth_required
 def get(cardid):
 	# Get the most recent prices
 	raw_prices = fetch_query(
@@ -42,6 +43,7 @@ def get(cardid):
 	return jsonify(price)
 
 
+# TODO: Protect this route from DDOS, etc
 @bp.route('update', methods=['POST'])
 def update():
 	# Get any cards that don't have a current price

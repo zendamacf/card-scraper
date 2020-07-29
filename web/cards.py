@@ -1,30 +1,52 @@
 from flask import Blueprint, jsonify
-from web import asynchro, tcgplayer
-from flasktools.db import mutate_query
+from web import asynchro, decorators, tcgplayer
+from web.utils import strip_unicode
+from flasktools.db import fetch_query, mutate_query
 
 
 bp = Blueprint('cards', __name__)
 
 
 @bp.route('')
-def get():
-	pass
+@decorators.paginated
+def get(page, limit):
+	pagecount = fetch_query(
+		"SELECT CEIL(count(1)::NUMERIC / %(length)s)::INT AS count FROM card",
+		{'length': limit},
+		single_row=True
+	)['count']
+
+	cards = fetch_query(
+		"""
+		SELECT
+			c.id,
+			c.collectornumber,
+			c.name,
+			c.rarity,
+			c.type,
+			c.power,
+			c.toughness,
+			c.oracletext,
+			c.flavortext,
+			c.url,
+			c.imageurl,
+			s.name AS set
+		FROM card c
+		LEFT JOIN card_set s ON (s.id = c.card_setid)
+		ORDER BY c.id
+		LIMIT %(length)s
+		OFFSET (%(page)s - 1) * %(length)s
+		""",
+		{'length': limit, 'page': page}
+	)
+
+	return jsonify(page=page, pagecount=pagecount, cards=strip_unicode(cards))
 
 
 @bp.route('update', methods=['POST'])
 def update():
 	print('Getting sets')
 	groups = tcgplayer.get_all_groups()
-	insert_sets(groups)
-
-	print('Getting cards')
-	for g in groups:
-		asynchro.fetch_cards.delay(g['groupId'], g['name'])
-
-	return jsonify()
-
-
-def insert_sets(groups):
 	mutate_query(
 		"""
 		INSERT INTO card_set (tcgplayerid, name, released)
@@ -34,3 +56,9 @@ def insert_sets(groups):
 		groups,
 		executemany=True
 	)
+
+	print('Getting cards')
+	for g in groups:
+		asynchro.fetch_cards.delay(g['groupId'], g['name'])
+
+	return jsonify()

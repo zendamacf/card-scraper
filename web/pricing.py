@@ -6,9 +6,40 @@ from web import asynchro
 bp = Blueprint('pricing', __name__)
 
 
-@bp.route('')
-def get():
-	pass
+@bp.route('/<int:cardid>')
+def get(cardid):
+	# Get the most recent prices
+	raw_prices = fetch_query(
+		"""
+		SELECT DISTINCT ON (cardid, foil)
+			low,
+			mid,
+			high,
+			market,
+			foil,
+			TO_CHAR(created, 'YYYY-MM-DD') AS updated
+		FROM price
+		WHERE cardid = %(cardid)s
+		ORDER BY cardid, foil, created DESC
+		""",
+		{'cardid': cardid}
+	)
+	normal = {}
+	foil = {}
+	for p in raw_prices:
+		if p['foil']:
+			del p['foil']
+			foil = p
+		else:
+			del p['foil']
+			normal = p
+
+	price = {
+		'normal': normal,
+		'foil': foil
+	}
+
+	return jsonify(price)
 
 
 @bp.route('update', methods=['POST'])

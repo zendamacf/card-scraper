@@ -46,8 +46,3 @@ def teardown(e):
 @app.route('/ping')
 def ping():
 	return jsonify(ping='pong')
-
-
-@app.route('/')
-def hello():
-	return 'hello world'

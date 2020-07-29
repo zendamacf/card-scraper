@@ -74,10 +74,10 @@ def fetch_prices(cards: list) -> None:
 		FROM card WHERE tcgplayerid = %(productId)s
 		ON CONFLICT (cardid, foil, created) DO NOTHING;
 		""",
-		prices,
+		inserts,
 		executemany=True
 	)
-	print(f'Updated prices for {len(prices)} cards')
+	print(f'Updated {len(inserts)} prices for {len(cards)} cards')
 
 
 def _strip_newlines(s):

@@ -8,22 +8,26 @@ def paginated(f):
 	"""Parse pagination URL parameters, and pass them through to function.
 
 	Will pass through page & limit as the first 2 parameters."""
+	DEFAULT_PAGE = 1
 	DEFAULT_LIMIT = 250
 	MAX_LIMIT = 2500
+
+	def force_int(val, backup):
+		try:
+			val = int(val or backup)
+		except (TypeError, ValueError):
+			val = backup
+
+		return val
 
 	@wraps(f)
 	def decorated_function(*args, **kwargs):
 		params = params_to_dict(request.args)
-		page = params.get('page') or 1
-		limit = params.get('limit') or DEFAULT_LIMIT
-
-		try:
-			limit = int(params.get('limit'))
-		except (TypeError, ValueError):
-			# raise
-			limit = DEFAULT_LIMIT
+		page = force_int(params.get('page'), DEFAULT_PAGE)
+		limit = force_int(params.get('limit'), DEFAULT_LIMIT)
 
 		limit = min(limit, MAX_LIMIT)
+		page = max(page, DEFAULT_PAGE)
 
 		return f(page, limit, *args, **kwargs)
 

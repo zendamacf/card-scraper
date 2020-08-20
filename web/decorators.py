@@ -23,7 +23,7 @@ def paginated(f):
 			# raise
 			limit = DEFAULT_LIMIT
 
-		limit = max(limit, MAX_LIMIT)
+		limit = min(limit, MAX_LIMIT)
 
 		return f(page, limit, *args, **kwargs)
 

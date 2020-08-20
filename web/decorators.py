@@ -9,12 +9,14 @@ def paginated(f):
 
 	Will pass through page & limit as the first 2 parameters."""
 	DEFAULT_LIMIT = 250
+	MAX_LIMIT = 2500
 
 	@wraps(f)
 	def decorated_function(*args, **kwargs):
 		params = params_to_dict(request.args)
 		page = params.get('page') or 1
 		limit = params.get('limit') or DEFAULT_LIMIT
+		limit = max(limit, MAX_LIMIT)
 
 		try:
 			limit = int(params.get('limit'))

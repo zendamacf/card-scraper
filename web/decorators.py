@@ -16,13 +16,14 @@ def paginated(f):
 		params = params_to_dict(request.args)
 		page = params.get('page') or 1
 		limit = params.get('limit') or DEFAULT_LIMIT
-		limit = max(limit, MAX_LIMIT)
 
 		try:
 			limit = int(params.get('limit'))
 		except (TypeError, ValueError):
 			# raise
 			limit = DEFAULT_LIMIT
+
+		limit = max(limit, MAX_LIMIT)
 
 		return f(page, limit, *args, **kwargs)
 

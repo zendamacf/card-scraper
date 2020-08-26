@@ -31,7 +31,7 @@ def get(page, limit):
 			c.flavortext,
 			c.url,
 			c.imageurl,
-			s.name AS set
+			s.name AS setname
 		FROM card c
 		LEFT JOIN card_set s ON (s.id = c.card_setid)
 		ORDER BY c.id

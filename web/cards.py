@@ -31,7 +31,8 @@ def get(page, limit):
 			c.flavortext,
 			c.url,
 			c.imageurl,
-			s.name AS setname
+			s.name AS setname,
+			s.code AS setcode
 		FROM card c
 		LEFT JOIN card_set s ON (s.id = c.card_setid)
 		ORDER BY c.id
@@ -45,14 +46,14 @@ def get(page, limit):
 
 
 # TODO: Protect this route from DDOS, etc
-@bp.route('update', methods=['POST'])
+@bp.route('update', methods=['GET'])
 def update():
 	print('Getting sets')
 	groups = tcgplayer.get_all_groups()
 	mutate_query(
 		"""
-		INSERT INTO card_set (tcgplayerid, name, released)
-		SELECT %(groupId)s, %(name)s, %(publishedOn)s
+		INSERT INTO card_set (tcgplayerid, name, code, released)
+		SELECT %(groupId)s, %(name)s, %(abbreviation)s, %(publishedOn)s
 		WHERE NOT EXISTS (SELECT 1 FROM card_set WHERE tcgplayerid = %(groupId)s)
 		""",
 		groups,

@@ -5,6 +5,7 @@ CREATE TABLE card_set (
 	id SERIAL PRIMARY KEY,
 	tcgplayerid INTEGER NOT NULL,
 	name TEXT NOT NULL,
+	code TEXT,
 	released DATE NOT NULL
 );
 

@@ -8,7 +8,7 @@ bp = Blueprint('cards', __name__)
 
 
 @bp.route('')
-# @decorators.auth_required
+@decorators.auth_required
 @decorators.paginated
 def get(lastid, limit):
 	cards = fetch_query(

@@ -61,7 +61,7 @@ def update():
 	)
 
 	print('Getting cards')
-	for g in groups:
+	for g in sorted(groups, key=lambda i: i['name']):
 		asynchro.fetch_cards.delay(g['groupId'], g['name'])
 
 	return jsonify()

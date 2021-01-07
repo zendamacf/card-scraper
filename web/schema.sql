@@ -13,7 +13,7 @@ CREATE TABLE card (
 	id SERIAL PRIMARY KEY,
 	tcgplayerid INTEGER NOT NULL,
 	card_setid INTEGER NOT NULL REFERENCES card_set(id),
-	collectornumber TEXT NOT NULL,
+	collectornumber TEXT,
 	name TEXT NOT NULL,
 	rarity CHAR(1) NOT NULL,
 	type TEXT,

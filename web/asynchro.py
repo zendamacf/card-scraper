@@ -38,7 +38,7 @@ def fetch_cards(groupid: int, name: str) -> None:
 	print(f'[{name}]: Fetching cards')
 	products = []
 	for r in tcgplayer.get_all_products(groupid):
-		if 'Number' in r['extendedData']:  # Ignore tokens
+		if r['extendedData']['Rarity'] not in ['T']:  # Ignore tokens
 			products.append(_map_card(r))
 
 	_insert_cards(products)
@@ -96,7 +96,7 @@ def _map_card(product):
 		'id': product['productId'],
 		'name': product['name'],
 		'groupid': product['groupId'],
-		'collectornumber': product['extendedData']['Number'],
+		'collectornumber': product['extendedData'].get('Number'),
 		'rarity': product['extendedData']['Rarity'],
 		'type': product['extendedData'].get('SubType'),
 		'power': product['extendedData'].get('P'),

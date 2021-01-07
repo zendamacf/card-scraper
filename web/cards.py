@@ -8,15 +8,9 @@ bp = Blueprint('cards', __name__)
 
 
 @bp.route('')
-@decorators.auth_required
+# @decorators.auth_required
 @decorators.paginated
-def get(page, limit):
-	pagecount = fetch_query(
-		"SELECT CEIL(count(1)::NUMERIC / %(length)s)::INT AS count FROM card",
-		{'length': limit},
-		single_row=True
-	)['count']
-
+def get(lastid, limit):
 	cards = fetch_query(
 		"""
 		SELECT
@@ -34,15 +28,17 @@ def get(page, limit):
 			s.name AS setname,
 			s.code AS setcode
 		FROM card c
-		LEFT JOIN card_set s ON (s.id = c.card_setid)
+		INNER JOIN card_set s ON (s.id = c.card_setid)
+		WHERE CASE WHEN %(lastid)s IS NOT NULL THEN c.id > %(lastid)s ELSE true END
 		ORDER BY c.id
 		LIMIT %(length)s
-		OFFSET (%(page)s - 1) * %(length)s
 		""",
-		{'length': limit, 'page': page}
+		{'length': limit, 'lastid': lastid}
 	)
 
-	return jsonify(page=page, pagecount=pagecount, cards=strip_unicode(cards))
+	lastid = cards[-1]['id'] if len(cards) > 0 else None
+
+	return strip_unicode(cards), lastid
 
 
 # TODO: Protect this route from DDOS, etc

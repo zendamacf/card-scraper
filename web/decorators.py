@@ -2,13 +2,14 @@ from functools import wraps
 from flask import request, jsonify
 from flasktools import params_to_dict
 from flasktools.db import fetch_query
+from hashids import Hashids
 
 
 def paginated(f):
-	"""Parse pagination URL parameters, and pass them through to function.
+	"""Parse pagination URL parameters, and pass them through to function. This
+	uses cursor-based pagination, using hashids without a salt.
 
-	Will pass through page & limit as the first 2 parameters."""
-	DEFAULT_PAGE = 1
+	Will pass through last viewed ID & page limit as the first 2 parameters."""
 	DEFAULT_LIMIT = 250
 	MAX_LIMIT = 2500
 
@@ -23,13 +24,23 @@ def paginated(f):
 	@wraps(f)
 	def decorated_function(*args, **kwargs):
 		params = params_to_dict(request.args)
-		page = force_int(params.get('page'), DEFAULT_PAGE)
+		cursor = params.get('cursor')
 		limit = force_int(params.get('limit'), DEFAULT_LIMIT)
 
 		limit = min(limit, MAX_LIMIT)
-		page = max(page, DEFAULT_PAGE)
+		hashids = Hashids()
 
-		return f(page, limit, *args, **kwargs)
+		lastid = None
+		if cursor:
+			lastid = hashids.decode(cursor)
+
+		payload, new_lastid = f(lastid, limit, *args, **kwargs)
+
+		new_cursor = None
+		if new_lastid is not None:
+			new_cursor = hashids.encode(new_lastid)
+
+		return jsonify(cursor=new_cursor, data=payload)
 
 	return decorated_function
 

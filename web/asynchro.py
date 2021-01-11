@@ -104,7 +104,8 @@ def _map_card(product):
 		'oracle': _strip_newlines(product['extendedData'].get('OracleText')),
 		'flavor': _strip_newlines(product['extendedData'].get('FlavorText')),
 		'url': product['url'],
-		'imageurl': product['imageUrl']
+		# Increase the image resolution
+		'imageurl': product['imageUrl'].replace('200w', '400w')
 	}
 
 

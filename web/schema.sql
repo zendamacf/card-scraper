@@ -28,7 +28,7 @@ CREATE TABLE card (
 CREATE UNIQUE INDEX card_tcgplayerid_idx ON card (tcgplayerid); 
 
 CREATE TABLE price (
-	cardid INTEGER NOT NULL REFERENCES card(id),
+	cardid INTEGER NOT NULL REFERENCES card(id) ON DELETE CASCADE,
 	low MONEY,
 	mid MONEY,
 	high MONEY,
